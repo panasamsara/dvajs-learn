@@ -1,64 +1,13 @@
-import { Layout, Menu, Breadcrumb, Table, Tag, Space, Button, } from 'antd';
+import { Layout, Menu, Breadcrumb, Table, Tag, Space, Button, Modal, Form, Input,} from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import dayjs from 'dayjs';
+import React, { useState, } from 'react';
+
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
-const columns = [
-  {
-    title: '标题',
-    dataIndex: 'title',
-    key: 'title',
-    render: text => <a>{text}</a>,
-  },
-  {
-    title: '内容',
-    dataIndex: 'content',
-    key: 'content',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createdAt',
-    // key: 'createdAt',
-    render: (text, record) => (
-      <Space size="middle">
-        <a> {dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</a>
-      </Space>
-    ),
-  },
-  // {
-  //   title: 'Tags',
-  //   key: 'tags',
-  //   dataIndex: 'tags',
-  //   render: tags => (
-  //     <>
-  //       {tags.map(tag => {
-  //         let color = tag.length > 5 ? 'geekblue' : 'green';
-  //         if (tag === 'loser') {
-  //           color = 'volcano';
-  //         }
-  //         return (
-  //           <Tag color={color} key={tag}>
-  //             {tag.toUpperCase()}
-  //           </Tag>
-  //         );
-  //       })}
-  //     </>
-  //   ),
-  // },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (text, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
 
 const data = [
   {
@@ -85,13 +34,88 @@ const data = [
 ];
 
 function IndexPage({dispatch, productsModel, indexModel, loading}) {
-  function handleClick (){
+  const columns = [
+    {
+      title: '标题',
+      dataIndex: 'title',
+      key: 'title',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: '内容',
+      dataIndex: 'content',
+      key: 'content',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text, record) => (
+        <Space size="middle">
+          <a> {dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</a>
+        </Space>
+      ),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (text, record) => (
+        <Space size="middle">
+          <a onClick={()=>showModal(record)}>编辑</a>
+          <a>Delete</a>
+        </Space>
+      ),
+    },
+  ];
+
+  function getList (){
     dispatch({
       type: 'productsModel/fetch',
       payload: {},
     })
   };
   
+  const [form] = Form.useForm();
+  
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [rowData, setRowData] = useState({});
+
+  const showModal = (row) => {
+    setIsModalVisible(true);
+    setRowData(row)
+    form.setFieldsValue(row);
+  };
+  const handleOk = (values) => {
+    dispatch({
+      type: 'productsModel/update', 
+      payload: {
+        ...rowData,
+        ...form.getFieldsValue()
+      } 
+    });
+    setIsModalVisible(false);
+    dispatch({type: 'productsModel/fetch'});
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+
+  const formItemLayout ={
+    labelCol: {
+      span: 4,
+    },
+    wrapperCol: {
+      span: 14,
+    },
+  };
+  const buttonItemLayout ={
+    wrapperCol: {
+      span: 14,
+      offset: 4,
+    },
+  };
+
   return (
     <Layout>
 
@@ -110,13 +134,39 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
               minHeight: 280,
             }}
           >
-            <Button type="primary" onClick={()=>handleClick()}>查询</Button>
+            <Button type="primary" onClick={()=>getList()}>查询</Button>
+            <Button type="primary" onClick={()=>showModal({})} style={{marginLeft: 10}}>新增</Button>
             <Table 
               columns={columns} 
               dataSource={productsModel.articles} 
               rowKey="id"
-              loading={loading}/>
+              loading={loading}
+            />
+
             <div>{indexModel.number}</div>
+            
+            <Modal title="文章" 
+              width={800}
+              visible={isModalVisible} 
+              onOk={handleOk} 
+              onCancel={handleCancel}
+            >
+              <Form
+                {...formItemLayout}
+                layout={"horizontal"}
+                form={form}
+                onFinish={handleOk}
+              >
+                <Form.Item label="标题" name="title">
+                  <Input placeholder="input placeholder" />
+                </Form.Item>
+                <Form.Item label="内容" name="content">
+                  <Input placeholder="input placeholder" />
+                </Form.Item>
+
+              </Form>  
+            </Modal>
+
           </Content>
         </Layout>
       </Layout>
