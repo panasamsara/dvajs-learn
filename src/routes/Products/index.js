@@ -1,6 +1,7 @@
 import { Layout, Menu, Breadcrumb, Table, Tag, Space, Button, } from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
+import dayjs from 'dayjs';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -20,7 +21,12 @@ const columns = [
   {
     title: '创建时间',
     dataIndex: 'createdAt',
-    key: 'createdAt',
+    // key: 'createdAt',
+    render: (text, record) => (
+      <Space size="middle">
+        <a> {dayjs(text).format('YYYY-MM-DD HH:mm:ss')}</a>
+      </Space>
+    ),
   },
   // {
   //   title: 'Tags',
@@ -82,9 +88,7 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
   function handleClick (){
     dispatch({
       type: 'productsModel/fetch',
-      payload: {
-        
-      },
+      payload: {},
     })
   };
   
@@ -107,7 +111,11 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
             }}
           >
             <Button type="primary" onClick={()=>handleClick()}>查询</Button>
-            <Table columns={columns} dataSource={productsModel.articles} loading={loading}/>
+            <Table 
+              columns={columns} 
+              dataSource={productsModel.articles} 
+              rowKey="id"
+              loading={loading}/>
             <div>{indexModel.number}</div>
           </Content>
         </Layout>

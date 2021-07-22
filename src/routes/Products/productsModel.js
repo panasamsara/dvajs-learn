@@ -25,7 +25,6 @@ export default {
     *fetch({ payload }, { call, put }) {  // eslint-disable-line
       try {
         const {code, data} = yield call(Service.getArticles, payload);  //调用接口
-        console.log(123, code, data)
         if(code){
           yield put({ type: 'save' , payload: data});
         } 
@@ -37,7 +36,6 @@ export default {
 
   reducers: {
     save(state, action) {
-      console.log(222, action)
       return { ...state, articles: action.payload };
     },
   },
