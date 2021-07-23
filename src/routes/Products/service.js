@@ -11,3 +11,7 @@ export function createArticle(data) {
 export function updateArticle(data) {
   return request('api/updateArticle',  {params: data} ); //编辑
 }
+
+export function deleteArticle(data) {
+  return request('api/deleteArticle',  {params: data} ); //删除
+}

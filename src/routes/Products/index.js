@@ -3,7 +3,9 @@ import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/
 import { connect } from 'dva';
 import dayjs from 'dayjs';
 import React, { useState, } from 'react';
-
+import {
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -62,7 +64,7 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
       render: (text, record) => (
         <Space size="middle">
           <a onClick={()=>showModal('edit',record)}>编辑</a>
-          <a>Delete</a>
+          <a onClick={()=>deleteData(record)}>删除</a>
         </Space>
       ),
     },
@@ -74,6 +76,23 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
       payload: {},
     })
   };
+  function deleteData (row){
+    Modal.confirm({
+      title: '确认',
+      icon: <ExclamationCircleOutlined />,
+      content: '确认要删除吗？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk(){
+        dispatch({
+          type: 'productsModel/deleteEff',
+          payload: {id: row.id},
+        })
+      }
+    });
+    
+  };
+
   
   const [form] = Form.useForm();
   
@@ -102,7 +121,6 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
       } 
     });
     setIsModalVisible(false);
-    dispatch({type: 'productsModel/fetch'});
   };
   const handleCancel = () => {
     setIsModalVisible(false);

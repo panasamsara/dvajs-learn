@@ -35,6 +35,9 @@ export default {
     *create({ payload }, { call, put }) {  // eslint-disable-line
       try {
         const {code, data} = yield call(Service.createArticle, payload);  //调用接口
+        if(code){
+          yield put({ type: 'fetch' });
+        } 
       } catch (e) {
         message.error(e.message);
       }
@@ -46,11 +49,25 @@ export default {
         message.error(e.message);
       }
     },
+    *deleteEff({ payload }, { call, put }) {  // eslint-disable-line
+      try {
+        const {code, data} = yield call(Service.deleteArticle, payload);  //调用接口
+        if(code){
+          yield put({ type: 'delete' , payload: data});
+        }
+      } catch (e) {
+        message.error(e.message);
+      }
+    },
   },
 
   reducers: {
     save(state, action) {
       return { ...state, articles: action.payload };
+    },
+    delete(state, action) {
+      let list = state.articles.filter(item=>item.id !=action.payload.id)
+      return { ...state, articles: list };
     },
   },
 
