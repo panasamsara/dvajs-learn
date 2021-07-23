@@ -10,7 +10,7 @@ const app = dva();
 // 3. Model
 // app.model(require('./models/example').default);
 app.model(require('./models/menu').default);
-app.model(require('./routes/indexModel').default);
+app.model(require('./routes/IndexPage/indexModel').default);
 app.model(require('./routes/Products/productsModel').default);
 
 // 4. Router
