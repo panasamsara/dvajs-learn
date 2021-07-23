@@ -61,7 +61,7 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <a onClick={()=>showModal(record)}>编辑</a>
+          <a onClick={()=>showModal('edit',record)}>编辑</a>
           <a>Delete</a>
         </Space>
       ),
@@ -79,15 +79,23 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [rowData, setRowData] = useState({});
+  const [modalFlag, setModalFlag] = useState('add');
 
-  const showModal = (row) => {
+  // 打开新增\编辑弹框
+  const showModal = (flag, row={}) => {
+    if(flag == 'add'){
+      form.resetFields();
+    }else{
+      form.setFieldsValue(row);
+    }
+    setModalFlag(flag);
     setIsModalVisible(true);
-    setRowData(row)
-    form.setFieldsValue(row);
+    setRowData(row);
   };
+  //保存按钮
   const handleOk = (values) => {
     dispatch({
-      type: 'productsModel/update', 
+      type: modalFlag =='add' ? 'productsModel/create':'productsModel/update', 
       payload: {
         ...rowData,
         ...form.getFieldsValue()
@@ -135,7 +143,7 @@ function IndexPage({dispatch, productsModel, indexModel, loading}) {
             }}
           >
             <Button type="primary" onClick={()=>getList()}>查询</Button>
-            <Button type="primary" onClick={()=>showModal({})} style={{marginLeft: 10}}>新增</Button>
+            <Button type="primary" onClick={()=>showModal( 'add')} style={{marginLeft: 10}}>新增</Button>
             <Table 
               columns={columns} 
               dataSource={productsModel.articles} 

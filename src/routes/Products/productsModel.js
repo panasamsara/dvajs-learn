@@ -32,6 +32,13 @@ export default {
         message.error(e.message);
       }
     },
+    *create({ payload }, { call, put }) {  // eslint-disable-line
+      try {
+        const {code, data} = yield call(Service.createArticle, payload);  //调用接口
+      } catch (e) {
+        message.error(e.message);
+      }
+    },
     *update({ payload }, { call, put }) {  // eslint-disable-line
       try {
         const {code, data} = yield call(Service.updateArticle, payload);  //调用接口
